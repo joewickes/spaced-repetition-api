@@ -1,6 +1,4 @@
 require('dotenv').config();
-const pg = require('pg') 
-pg.defaults.ssl = true;
 
 const knex = require('knex')
 const app = require('./app')
