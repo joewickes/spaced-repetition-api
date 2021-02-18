@@ -49,7 +49,8 @@ const LanguageService = {
         and l.head = w.id 
       group by w.id, w.original, w.correct_count, w.incorrect_count, w.next, l.head;
     `)
-  
+  },
+  guessWord(db, word) {
   }
 }
 

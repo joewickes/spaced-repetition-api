@@ -47,9 +47,6 @@ languageRouter
 
 languageRouter
   .get('/head', async (req, res, next) => {
-    // implement me 
-    // POST
-      // Get next word (original) to submit answer for
       LanguageService.getNextWord(req.app.get('db'), req.user.id)
         .then(response => {
           const wordObj = {
@@ -70,8 +67,11 @@ languageRouter
 
 languageRouter
   .post('/guess', async (req, res, next) => {
-    // implement me
-    res.send('implement me!')
+    if (!!req.guess) {
+      
+    } else {
+      res.status(400).send({error: "Missing 'guess' in request body"});
+    }
   })
 
 module.exports = languageRouter
