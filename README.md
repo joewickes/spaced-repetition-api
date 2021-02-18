@@ -2,15 +2,15 @@
 
 ## Local dev setup
 
-If using user `dunder-mifflin`:
+If using user `joe`:
 
 ```bash
 mv example.env .env
-createdb -U dunder-mifflin spaced-repetition
-createdb -U dunder-mifflin spaced-repetition-test
+createdb -U joe spaced-repetition
+createdb -U joe spaced-repetition-test
 ```
 
-If your `dunder-mifflin` user has a password be sure to set it in `.env` for all appropriate fields. Or if using a different user, update appropriately.
+If your `joe` user has a password be sure to set it in `.env` for all appropriate fields. Or if using a different user, update appropriately.
 
 ```bash
 npm install
