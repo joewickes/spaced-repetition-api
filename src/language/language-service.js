@@ -28,29 +28,87 @@ const LanguageService = {
       )
       .where({ language_id })
   },
-  getNextWord(db, user_id) {
+  getHeadWord(db, user_id) {
     return db
       .raw(`
+        select 
+          w.id, 
+          w.original, 
+          w.correct_count, 
+          w.incorrect_count, 
+          w.next,
+          l.head,
+          (select sum(w.correct_count - w.incorrect_count) 
+            from word w
+            inner join language l on w.language_id  = l.id
+            where l.user_id = ${user_id}
+          ) as total_score
+        from word w
+        inner join language l on w.language_id  = l.id
+        where l.user_id = ${user_id}
+          and l.head = w.id 
+        group by w.id, w.original, w.correct_count, w.incorrect_count, w.next, l.head;
+      `)
+    ;
+  },
+  getAllWords(db, user_id) {
+    return db
+      .raw(`
+        select 
+          w.id, 
+          w.original, 
+          w.translation,
+          w.correct_count, 
+          w.incorrect_count, 
+          w.next,
+          l.head,
+          (select sum(w.correct_count - w.incorrect_count) 
+            from word w
+            inner join language l on w.language_id  = l.id
+            where l.user_id = ${user_id}
+          ) as total_score
+        from word w
+        inner join language l on w.language_id  = l.id
+        where l.user_id = ${user_id}
+        group by w.id, w.original, w.correct_count, w.incorrect_count, w.next, l.head;
+      `)
+    ;
+  },
+  getFirstWord(db, user_id) {
+    return db
+    .raw(`
       select 
-        w.id, 
-        w.original, 
-        w.correct_count, 
-        w.incorrect_count, 
-        w.next,
-        l.head,
-        (select sum(w.correct_count - w.incorrect_count) 
-          from word w
-          inner join language l on w.language_id  = l.id
-          where l.user_id = ${user_id}
-        ) as total_score
+        *
       from word w
       inner join language l on w.language_id  = l.id
       where l.user_id = ${user_id}
-        and l.head = w.id 
-      group by w.id, w.original, w.correct_count, w.incorrect_count, w.next, l.head;
-    `)
+        and w.id = l.head;
+  `)
+    ;
   },
-  guessWord(db, word) {
+  getNextWord(db, user_id, next) {
+    return db
+      .raw(`
+        select 
+          *
+        from word w
+        inner join language l on w.language_id  = l.id
+        where l.user_id = ${user_id}
+          and w.id = ${next};
+      `)
+    ;
+  },
+  checkWord(db, user_id) {
+    return db
+      .raw(`
+        select 
+          *
+        from word w
+        inner join language l on w.language_id = l.id
+        where l.user_id = ${user_id}
+          and l.head = w.id;
+      `)
+    ;
   }
 }
 
