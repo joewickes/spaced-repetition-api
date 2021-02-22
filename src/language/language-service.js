@@ -35,10 +35,11 @@ const LanguageService = {
           w.id, 
           w.original, 
           w.correct_count, 
+          w.memory_value,
           w.incorrect_count, 
           w.next,
           l.head,
-          (select sum(w.correct_count - w.incorrect_count) 
+          (select sum(w.correct_count) 
             from word w
             inner join language l on w.language_id  = l.id
             where l.user_id = ${user_id}
@@ -58,11 +59,12 @@ const LanguageService = {
           w.id, 
           w.original, 
           w.translation,
+          w.memory_value,
           w.correct_count, 
           w.incorrect_count, 
           w.next,
           l.head,
-          (select sum(w.correct_count - w.incorrect_count) 
+          (select sum(w.correct_count) 
             from word w
             inner join language l on w.language_id  = l.id
             where l.user_id = ${user_id}
@@ -107,6 +109,44 @@ const LanguageService = {
         inner join language l on w.language_id = l.id
         where l.user_id = ${user_id}
           and l.head = w.id;
+      `)
+    ;
+  },
+  patchMovingWord(db, wordInfo) {
+    let correctKey = '';
+    if (wordInfo.incorrect_count) {
+      correctKey = 'incorrect_count';
+    } else if (wordInfo.correct_count) {
+      correctKey = 'correct_count';
+    }
+
+    return db
+      .raw(`
+        update word
+        set 
+          ${correctKey} = ${wordInfo[correctKey]},
+          memory_value = ${wordInfo.memory_value},
+          next = ${wordInfo.next}
+        where id = ${wordInfo.id};
+      `)
+    ;
+  },
+  patchAlteredWord(db, wordInfo) {
+    return db
+      .raw(`
+        update word
+        set
+          next = ${wordInfo.next}
+        where id = ${wordInfo.id};
+      `);
+  },
+  patchHeadWord(db, userID, headID) {
+    return db
+      .raw(`
+        update language
+        set 
+          head = ${headID}
+        where user_id = ${userID};
       `)
     ;
   }

@@ -71,17 +71,83 @@ languageRouter
 languageRouter
   .use(bodyParser)
   .post('/guess', async (req, res, next) => {
-    LanguageService.getAllWords(req.app.get('db'), req.user.id)
-      .then(response => {
-        responseArr = response.rows;
-        const linkedList = new LinkedList;
-        responseArr.forEach(item => {
-          const nextItem = responseArr.find(next => {
-            return next.id === item.next;
+    if (!req.body.guess) {
+      res.status(400).send({ error: "Missing 'guess' in request body" });
+    } else {
+      LanguageService.getAllWords(req.app.get('db'), req.user.id)
+        .then(response => {
+          responseArr = response.rows;
+          const linkedList = new LinkedList;
+          const headItemId = responseArr[0].head;
+          responseArr.forEach(item => {
+            const nextItem = responseArr.find(next => {
+              return next.id === item.next;
+            });
+
+            if (nextItem === undefined) {
+              linkedList.insertItem(item, null, (item.id === headItemId ? true : false));
+            } else {
+              linkedList.insertItem(item, nextItem, (item.id === headItemId ? true : false));
+            }
           });
-          linkedList.insertItem(item, nextItem);
-        });
-      })
+
+          const headInfo = linkedList.grabHeadInfo();
+          
+          if (linkedList.checkTranslation(req.body.guess)) {
+
+            const memoryValue = headInfo.memory_value * 2;
+            const movedInfo = linkedList.moveItem(memoryValue);
+            
+            const movingInfoDB = {
+              correct_count: 1,
+              memory_value: memoryValue,
+              ...movedInfo.moving
+            }
+
+            Promise.all([
+              LanguageService.patchMovingWord(req.app.get('db'), movingInfoDB), 
+              LanguageService.patchAlteredWord(req.app.get('db'), movedInfo.altered),
+              LanguageService.patchHeadWord(req.app.get('db'), req.user.id, movedInfo.head.id)
+            ]).then((results) => {
+              const newHeadInfo = linkedList.grabHeadInfo();
+              res.json({
+                answer: headInfo.translation,
+                isCorrect: true,
+                nextWord: responseArr.find(item => item.id === headInfo.next).original,
+                totalScore: parseInt(headInfo.total_score) + 1,
+                wordCorrectCount: newHeadInfo.correct_count,
+                wordIncorrectCount: newHeadInfo.incorrect_count
+              });
+            });            
+          } else {
+            const memoryValue = 1;
+            const movedInfo = linkedList.moveItem(memoryValue);
+            
+            const movingInfoDB = {
+              memory_value: memoryValue,
+              incorrect_count: 1,
+              ...movedInfo.moving
+            }
+
+            Promise.all([
+              LanguageService.patchMovingWord(req.app.get('db'), movingInfoDB), 
+              LanguageService.patchAlteredWord(req.app.get('db'), movedInfo.altered),
+              LanguageService.patchHeadWord(req.app.get('db'), req.user.id, movedInfo.head.id)
+            ]).then((results) => {
+              const newHeadInfo = linkedList.grabHeadInfo();
+              res.json({
+                answer: headInfo.translation,
+                isCorrect: false,
+                nextWord: responseArr.find(item => item.id === headInfo.next).original,
+                totalScore: parseInt(headInfo.total_score),
+                wordCorrectCount: newHeadInfo.correct_count,
+                wordIncorrectCount: newHeadInfo.incorrect_count
+              });
+            });
+          }
+        })
+      ;  
+    }
   })
 ;
 
