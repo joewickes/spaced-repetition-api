@@ -112,7 +112,7 @@ const LanguageService = {
       `)
     ;
   },
-  patchMovingWord(db, wordInfo) {
+  patchMovingWord(db, wordInfo, score) {
     let correctKey = '';
     if (wordInfo.incorrect_count) {
       correctKey = 'incorrect_count';
@@ -124,7 +124,7 @@ const LanguageService = {
       .raw(`
         update word
         set 
-          ${correctKey} = ${wordInfo[correctKey]},
+          ${correctKey} = ${score},
           memory_value = ${wordInfo.memory_value},
           next = ${wordInfo.next}
         where id = ${wordInfo.id};

@@ -13,38 +13,30 @@ class LinkedList {
   walkThroughIds() {
     if (this.head) {
       let currNode = this.head;
+      
       while (currNode.next !== null) {
+        console.log(currNode.value.id);
         currNode = currNode.next;
       }
+      console.log(currNode.value.id);
+      console.log(currNode.next);
       
     }
   }
 
-  insertItem(item, next, head) {
-    let currNode = null;
-    if (head) {
-      if (this.head) {
-        if (this.head.value.id === next.id) {
-          currNode = this.head
-          this.head = new _Node(item, currNode);
-        } else {
-          this.head = new _Node(item, next);
-        }
-      } else {
-        this.head = new _Node(item, next);
-      }
-    } else if (this.head === null) {
-      this.head = new _Node(item, next);
-    } else {
-      
-      let lastNode = null;
-      currNode = this.head;
-      while (currNode.next.hasOwnProperty('value')) {
-        lastNode = currNode;
+  insertItem(item, next) {
+    if (this.head) {
+      let currNode = this.head;
+
+      while (typeof currNode.next !== 'number') {
         currNode = currNode.next;
       }
 
-      currNode.next = new _Node(item, next);
+      if (currNode.next === item.id) {
+        currNode.next = new _Node(item, next);
+      }
+    } else {
+      this.head = new _Node(item, next);
     }
   }
 
@@ -77,7 +69,7 @@ class LinkedList {
       return {
         moving: {
           id: movingNode.value.id,
-          next: movingNode.next.value.id
+          next: (movingNode.next === null ? null : movingNode.next.value.id)
         }, 
         altered: {
           id: currNode.value.id,

@@ -79,17 +79,22 @@ languageRouter
           responseArr = response.rows;
           const linkedList = new LinkedList;
           const headItemId = responseArr[0].head;
-          responseArr.forEach(item => {
-            const nextItem = responseArr.find(next => {
-              return next.id === item.next;
-            });
 
-            if (nextItem === undefined) {
-              linkedList.insertItem(item, null, (item.id === headItemId ? true : false));
-            } else {
-              linkedList.insertItem(item, nextItem, (item.id === headItemId ? true : false));
-            }
-          });
+          // Grab head and insert it first
+          const head = responseArr.find(item => item.id === headItemId);
+          let nextVal = head.next;
+          const updateResponseArr = responseArr.filter(item => item.id !== headItemId);
+          console.log('inserting head', head.id, nextVal)
+          linkedList.insertItem(head, nextVal);
+
+          for (let i = 0; i < updateResponseArr.length; i++) {
+            const item = updateResponseArr.find(item => item.id === nextVal);
+            nextVal = item.next;
+            console.log('inserting not head', item.id, nextVal)
+            linkedList.insertItem(item, nextVal);  
+          }
+
+          linkedList.walkThroughIds();
 
           const headInfo = linkedList.grabHeadInfo();
           
@@ -105,7 +110,7 @@ languageRouter
             }
 
             Promise.all([
-              LanguageService.patchMovingWord(req.app.get('db'), movingInfoDB), 
+              LanguageService.patchMovingWord(req.app.get('db'), movingInfoDB, headInfo.correct_count + 1), 
               LanguageService.patchAlteredWord(req.app.get('db'), movedInfo.altered),
               LanguageService.patchHeadWord(req.app.get('db'), req.user.id, movedInfo.head.id)
             ]).then((results) => {
@@ -114,7 +119,7 @@ languageRouter
                 answer: headInfo.translation,
                 isCorrect: true,
                 nextWord: responseArr.find(item => item.id === headInfo.next).original,
-                totalScore: parseInt(headInfo.total_score) + 1,
+                totalScore: parseInt(newHeadInfo.total_score) + 1,
                 wordCorrectCount: newHeadInfo.correct_count,
                 wordIncorrectCount: newHeadInfo.incorrect_count
               });
@@ -130,7 +135,7 @@ languageRouter
             }
 
             Promise.all([
-              LanguageService.patchMovingWord(req.app.get('db'), movingInfoDB), 
+              LanguageService.patchMovingWord(req.app.get('db'), movingInfoDB, headInfo.incorrect_count + 1), 
               LanguageService.patchAlteredWord(req.app.get('db'), movedInfo.altered),
               LanguageService.patchHeadWord(req.app.get('db'), req.user.id, movedInfo.head.id)
             ]).then((results) => {
