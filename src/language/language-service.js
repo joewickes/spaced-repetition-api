@@ -27,10 +27,10 @@ const LanguageService = {
           w.incorrect_count,
           (select sum(w.correct_count) 
             from word w
-            where w.language_id = 2
+            where w.language_id = ${language_id}
           ) as total_score
         from word w
-        where w.language_id = 2
+        where w.language_id = ${language_id}
         group by 
           w.id, 
           w.language_id, 
