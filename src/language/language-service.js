@@ -25,6 +25,7 @@ const LanguageService = {
         'memory_value',
         'correct_count',
         'incorrect_count',
+        'select sum(w.correct_count) as total_score'
       )
       .where({ language_id })
   },
