@@ -39,7 +39,8 @@ const LanguageService = {
           w.next,
           w.memory_value,
           w.correct_count,
-          w.incorrect_count;
+          w.incorrect_count
+        order by w.next;
       `)
     ;
   },

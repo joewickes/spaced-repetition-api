@@ -86,7 +86,6 @@ describe.only('Language Endpoints', function () {
         .expect(200)
         .expect(res => {
           expect(res.body).to.have.keys('language', 'words')
-
           expect(res.body.language).to.have.property('id', usersLanguage.id)
           expect(res.body.language).to.have.property('name', usersLanguage.name)
           expect(res.body.language).to.have.property('user_id', usersLanguage.user_id)
@@ -97,11 +96,11 @@ describe.only('Language Endpoints', function () {
           usersWords.forEach((usersWord, idx) => {
             const word = res.body.words[idx]
             expect(word).to.have.property('id', usersWord.id)
-            expect(word).to.have.property('original', usersWord.original)
-            expect(word).to.have.property('translation', usersWord.translation)
-            expect(word).to.have.property('memory_value', 1)
-            expect(word).to.have.property('correct_count', 0)
-            expect(word).to.have.property('incorrect_count', 0)
+            '8', !!expect(word).to.have.property('original', usersWord.original)
+            '9', !!expect(word).to.have.property('translation', usersWord.translation)
+            '10', !!expect(word).to.have.property('memory_value', 1)
+            '11', !!expect(word).to.have.property('correct_count', 0)
+            '12', !!expect(word).to.have.property('incorrect_count', 0)
           })
         })
     })
