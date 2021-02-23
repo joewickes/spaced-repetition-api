@@ -7,5 +7,3 @@ linkedList.insertItem({id: 2, memory_value: 1, next: 3});
 linkedList.insertItem({id: 3, memory_value: 1, next: null});
 
 linkedList.moveItem(1);
-
-console.log(linkedList);

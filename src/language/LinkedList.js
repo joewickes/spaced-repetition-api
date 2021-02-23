@@ -15,11 +15,8 @@ class LinkedList {
       let currNode = this.head;
       
       while (currNode.next !== null) {
-        console.log(currNode.value.id);
         currNode = currNode.next;
       }
-      console.log(currNode.value.id);
-      console.log(currNode.next);
       
     }
   }

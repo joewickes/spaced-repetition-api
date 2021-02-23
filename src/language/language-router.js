@@ -61,7 +61,7 @@ languageRouter
           res.json(wordObj);
         })
         .catch(error => {
-          console.log(error)
+          // console.log(error)
           next();
         })
       ;
@@ -84,13 +84,11 @@ languageRouter
           const head = responseArr.find(item => item.id === headItemId);
           let nextVal = head.next;
           const updateResponseArr = responseArr.filter(item => item.id !== headItemId);
-          console.log('inserting head', head.id, nextVal)
           linkedList.insertItem(head, nextVal);
 
           for (let i = 0; i < updateResponseArr.length; i++) {
             const item = updateResponseArr.find(item => item.id === nextVal);
             nextVal = item.next;
-            console.log('inserting not head', item.id, nextVal)
             linkedList.insertItem(item, nextVal);  
           }
 
