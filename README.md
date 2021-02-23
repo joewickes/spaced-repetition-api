@@ -1,52 +1,85 @@
-# Spaced repetition API!
+# Spaced Repetition API
 
-## Local dev setup
+## Live Link: https://spaced-repetition-bice.vercel.app/
 
-If using user `joe`:
+## Front End Repo: https://github.com/joewickes/spaced-repetition/tree/main
 
-```bash
-mv example.env .env
-createdb -U joe spaced-repetition
-createdb -U joe spaced-repetition-test
-```
+## Table of Contents
+- [Summary](##-summary)
+- [How To Use It](##-how-to-use-it)
+- [Technologies Used](##-technologies-used)
 
-If your `joe` user has a password be sure to set it in `.env` for all appropriate fields. Or if using a different user, update appropriately.
+## Summary
+Spaced repetition is an app that helps users learn new words in a foreign language with the spaced repetition technique.
 
-```bash
-npm install
-npm run migrate
-env MIGRATION_DATABASE_NAME=spaced-repetition-test npm run migrate
-```
+As a user I can
+- While Logged Out
+  - Get automatically redirected to the Sign Up page
+  - Click on either Sign Up or Log In and get redirected to either page
+- While Logged In
+  - I can see a list of my words
+  - I can start learning
+  - I can guess the answer for each word
+  - I can see a response for my guess
+  - I can try the next word
+  - I can log out
 
-And `npm test` should work at this point
+## How To Use It
+Here are the different API endpoints, what kind of data they take, and what kind of end result to expect
 
-## Configuring Postgres
+Endpoint: /api/auth/token
+- Request Type: POST
+- Expected Data Type: Object with username and password
+- Happy Path Response: A 200 with an auth token
 
-For tests involving time to run properly, configure your Postgres database to run in the UTC timezone.
+-----
 
-1. Locate the `postgresql.conf` file for your Postgres installation.
-   1. E.g. for an OS X, Homebrew install: `/usr/local/var/postgres/postgresql.conf`
-   2. E.g. on Windows, _maybe_: `C:\Program Files\PostgreSQL\11.2\data\postgresql.conf`
-   3. E.g  on Ubuntu 18.04 probably: '/etc/postgresql/10/main/postgresql.conf'
-2. Find the `timezone` line and set it to `UTC`:
+Endpoint: /api/auth/token
+- Request Type: PATCH
+- Expected Data Type: Object with user id, user name, and jwt secret
+- Happy Path Response: A 200 with a refreshed token
 
-```conf
-# - Locale and Formatting -
+-----
 
-datestyle = 'iso, mdy'
-#intervalstyle = 'postgres'
-timezone = 'UTC'
-#timezone_abbreviations = 'Default'     # Select the set of available time zone
-```
+Endpoint: /api/language
+- Request Type: GET
+- Expected Data Type: N/A
+- Happy Path Response: A 200 with a object with a user's language and words
 
-## Scripts
+-----
 
-Start the application `npm start`
+Endpoint: /api/language/head
+- Request Type: GET
+- Expected Data Type: Object with user id
+- Happy Path Response: A 200 with a object with a users languages
 
-Start nodemon for the application `npm run dev`
+-----
 
-Run the tests mode `npm test`
+Endpoint: /api/language/guess
+- Request Type: POST
+- Expected Data Type: Object with guess
+- Happy Path Response: A 200 with an object with a next word, total score, correct and incorrect count, an answer, and whether the guess was correct or not
 
-Run the migrations up `npm run migrate`
+-----
 
-Run the migrations down `npm run migrate -- 0`
+Endpoint: /api/user
+- Request Type: POST
+- Expected Data Type: Object with username, password, and name
+- Happy Path Response: A 201 with a object with a serialized user (and populates language words)
+
+## Technologies Used
+- Node
+- Express
+- Knex
+- PostgreSQL
+- Helmet
+- Postgrator
+- Morgan
+- JWT
+- CORS
+- BcryptJS
+- Body-Parser
+- Chai (development)
+- Mocha (development)
+- Nodemon (development)
+- Supertest (development)
