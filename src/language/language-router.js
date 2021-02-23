@@ -38,10 +38,14 @@ languageRouter
         req.language.id,
       )
 
-      res.json({
-        language: req.language,
+      const newObj = {
+        language: {
+          ...req.language,
+          total_score: parseInt(words.rows[0].total_score)
+        },
         words: words.rows,
-      })
+      }
+      res.json(newObj)
       next()
     } catch (error) {
       next(error)
