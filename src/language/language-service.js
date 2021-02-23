@@ -15,19 +15,33 @@ const LanguageService = {
 
   getLanguageWords(db, language_id) {
     return db
-      .from('word')
-      .select(
-        'id',
-        'language_id',
-        'original',
-        'translation',
-        'next',
-        'memory_value',
-        'correct_count',
-        'incorrect_count',
-        'select sum(w.correct_count) as total_score'
-      )
-      .where({ language_id })
+      .raw(`
+        select 
+          w.id, 
+          w.language_id, 
+          w.original,
+          w.translation,
+          w.next,
+          w.memory_value,
+          w.correct_count,
+          w.incorrect_count,
+          (select sum(w.correct_count) 
+            from word w
+            where w.language_id = 2
+          ) as total_score
+        from word w
+        where w.language_id = 2
+        group by 
+          w.id, 
+          w.language_id, 
+          w.original,
+          w.translation,
+          w.next,
+          w.memory_value,
+          w.correct_count,
+          w.incorrect_count;
+      `)
+    ;
   },
   getHeadWord(db, user_id) {
     return db
