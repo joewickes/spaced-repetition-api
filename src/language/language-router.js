@@ -40,7 +40,7 @@ languageRouter
 
       res.json({
         language: req.language,
-        words,
+        words: words.rows,
       })
       next()
     } catch (error) {
